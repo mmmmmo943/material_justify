@@ -1,37 +1,44 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [color, setColor] = useState("red"); // 假设你将来可能会使用这个状态
+  const text = "酸酸的jiojio小不点喜欢吃"; // 需要滚动的文字
+  let x = 0; // 文字的起始x坐标
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return; // 如果canvas不存在，则不执行后面的代码
-    const gl = canvas.getContext("2d")!;
-    gl.clearRect(0, 0, canvas.width, canvas.height);
-    gl.fillStyle = color;
-    // 清除之前的画布内容
-    gl.clearRect(0, 0, canvas.width, canvas.height);
-    // 填充整个画布
-    gl.fillRect(0, 0, canvas.width, canvas.height);
-    // 设置正方形的颜色
-    gl.fillStyle = "white"; // 正方形的颜色
-    console.log(canvas.width / 2, canvas.height);
-    gl.translate(canvas.width / 2, canvas.height / 2);
-    gl.rotate(-Math.PI / 2);
-    // gl.transform(2, 0.5, -0.5, 5, -60, 100);
-    // gl.resetTransform();
-    // gl.globalAlpha = 0.5;
-    // 在坐标原点绘制一个100x100的正方形
-    gl.fillRect(-50, -50, 100, 100);
-    gl.fillStyle = "yellow";
-    gl.fillRect(50, -50, 100, 100);
-    gl.fillStyle = "black";
-    gl.fillRect(-50, 50, 100, 100);
-  }, [color]); // 将color添加为依赖项，这样每当颜色变化时，useEffect都会重新执行
+    const canvas = canvasRef.current!;
+    const gl = canvas.getContext("2d");
+
+    const draw = () => {
+      if (!canvas || !gl) return;
+
+      const width = canvas.width;
+      const height = canvas.height;
+
+      gl.clearRect(0, 0, width, height); // 清除画布
+      gl.fillStyle = "white"; // 设置画布背景为白色
+      gl.fillRect(0, 0, canvas.width, canvas.height); // 填充整个画布为白色
+
+      gl.fillStyle = "red"; // 文字的颜色
+      gl.textBaseline = "middle"; // 设置文字的基线为中间
+      gl.textAlign = "left"; // 设置文字的对齐方式为左对齐
+      gl.font = "30px Arial"; // 设置字体大小和类型
+
+      gl.fillText(text, x, height / 2); // 绘制文字
+
+      x -= 2; // 更新文字的x坐标，使其向左移动
+      if (x < -gl.measureText(text).width) {
+        x = width; // 如果文字完全滚出画布，则重新从右侧开始
+      }
+
+      requestAnimationFrame(draw); // 请求下一帧动画
+    };
+
+    draw(); // 开始动画循环
+  }, []); // 传入一个空的依赖数组，确保effect只在挂载时运行一次
 
   return (
-    <div className="flex items-center justify-center  mt-[90px]">
+    <div className="flex items-center justify-center mt-[90px]">
       <canvas ref={canvasRef} width={1024} height={576} />
     </div>
   );

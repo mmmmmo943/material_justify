@@ -12,7 +12,7 @@ function MyComponent() {
           router.push("/gallery");
         }}
       >
-        to gallery
+        兔蛋点这里
       </p>
     </div>
   );
